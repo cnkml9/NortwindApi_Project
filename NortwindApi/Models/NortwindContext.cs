@@ -24,6 +24,7 @@ namespace NortwindApi.Models
         public virtual DbSet<CustomerAndSuppliersByCity> CustomerAndSuppliersByCities { get; set; } = null!;
         public virtual DbSet<CustomerDemographic> CustomerDemographics { get; set; } = null!;
         public virtual DbSet<Employee> Employees { get; set; } = null!;
+        public virtual DbSet<EmployeeTerritories> EmployeeTerritories { get; set; } = null!;
         public virtual DbSet<Invoice> Invoices { get; set; } = null!;
         public virtual DbSet<Order> Orders { get; set; } = null!;
         public virtual DbSet<OrderDetail> OrderDetails { get; set; } = null!;
@@ -57,7 +58,7 @@ namespace NortwindApi.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
-
+            modelBuilder.Entity<EmployeeTerritories>().HasNoKey();
             modelBuilder.Entity<AlphabeticalListOfProduct>(entity =>
             {
                 entity.HasNoKey();

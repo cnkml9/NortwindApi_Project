@@ -278,32 +278,236 @@ namespace NortwindApi.Controllers
 
         }
 
-        //[HttpGet("Eastren")]
+        [HttpGet("SpeedyExpWithN")]
 
 
-        //public IActionResult Eastren()
-        //{
+        public IActionResult SpeedyExpWithN()
+        {
 
-        //    var customers = from cst in _context.Customers
-        //                    join ord in _context.Orders on cst.CustomerId equals ord.CustomerId
-        //                    join emp in _context.Employees on ord.EmployeeId equals emp.EmployeeId
-        //                    join tr in _context.Territories on empt.Territory.TerritoryId equals tr.TerritoryId
-        //                    join r in _context.Regions on tr.Region.RegionId equals r.RegionId
-        //                    join shp in _context.Shippers on ord.ShipVia equals shp.ShipperId
-        //                    join ordt in _context.OrderDetails on ord.OrderId equals ordt.OrderId
-        //                    join prd in _context.Products on ordt.ProductId equals prd.ProductId
-        //                    join cts in _context.Categories on prd.CategoryId equals cts.CategoryId
-        //                    where r.RegionDescription == "Eastern" && shp.ShipperId == 3
-        //                    select cts;
+            var query = from o in _context.Orders
+                        join sh in _context.Shippers on o.ShipVia equals sh.ShipperId
+                        join emp in _context.Employees on o.EmployeeId equals emp.EmployeeId
+                        join cst in _context.Customers on o.CustomerId equals cst.CustomerId
+                        where (sh.ShipperId == 1 && emp.EmployeeId == 1 && (cst.CustomerId == "ALFKI" || cst.CustomerId == "DUMON"))
+                        select o;
 
-        //    var result = customers.ToList();
+            var orders = query.ToList();
 
-        //    return Ok(customers);
+            return Ok(orders);
 
 
-        //}
+        }
+
+        public class CategoryViewModel
+        {
+            public int CategoryID { get; set; }
+            public string CategoryName { get; set; }
+        }
+
+        [HttpGet("Eastren")]
+        public IActionResult Eastren()
+        {
+            using (var context = new NortwindContext())
+            {
+                var query = from cts in context.Categories
+                            join prd in context.Products on cts.CategoryId equals prd.CategoryId
+                            join ordt in context.OrderDetails on prd.ProductId equals ordt.ProductId
+                            join ord in context.Orders on ordt.OrderId equals ord.OrderId
+                            join cst in context.Customers on ord.CustomerId equals cst.CustomerId
+                            join emp in context.Employees on ord.EmployeeId equals emp.EmployeeId
+                            join empt in context.EmployeeTerritories on emp.EmployeeId equals empt.EmployeeId
+                            join tr in context.Territories on empt.TerritoryId equals tr.TerritoryId
+                            join r in context.Regions on tr.RegionId equals r.RegionId
+                            join shp in context.Shippers on ord.ShipVia equals shp.ShipperId
+                            where r.RegionDescription == "Eastern" && shp.ShipperId == 3
+                            select new{
+                    cts.CategoryId,cts.CategoryName
+                }
+                    ;
+
+                var categories = query.ToList();
+  
+
+                return Ok(categories);
+            }
+           
+        }
+
+        [HttpGet("ShippersLondon")]
+        public IActionResult ShippersLondon()
+        {
+            using (var context = new NortwindContext())
+            {
+                var query = from o in context.Orders
+                            join s in context.Shippers on o.ShipVia equals s.ShipperId
+                            join odt in context.OrderDetails on o.OrderId equals odt.OrderId
+                            join prd in context.Products on odt.ProductId equals prd.ProductId
+                            join spp in context.Suppliers on prd.SupplierId equals spp.SupplierId
+                            where spp.City == "London" && s.CompanyName.EndsWith("e")
+                                  && prd.UnitsInStock > 0 && prd.UnitPrice >= 10 && prd.UnitPrice <= 60
+                            select new
+                            {
+                                s.CompanyName,
+                                spp.City,
+                                prd.UnitsInStock,
+                                prd.UnitPrice,
+                                o
+                            };
+
+                var results = query.ToList();
+                return Ok(results);
+            }
+        }
+
+        [HttpGet("DiscontinuedSale")]
+        public IActionResult DiscontinuedSale()
+        {
+            using (var context = new NortwindContext())
+            {
+                var query = from prd in context.Products
+                            join s in context.Suppliers on prd.SupplierId equals s.SupplierId
+                            where prd.Discontinued && prd.UnitsInStock == 0
+                            select new
+                            {
+                                s.ContactName,
+                                s.Phone
+                            };
+
+                var results = query.ToList();
+                return Ok(results);
+            }
+        }
+
+        [HttpGet("NewYorkManager")]
+
+        public IActionResult NewYorkManager() {
+
+            using (var context = new NortwindContext())
+            {
+                var query = from t in context.Territories
+                            join empt in context.EmployeeTerritories on t.TerritoryId equals empt.TerritoryId
+                            join emp in context.Employees on empt.EmployeeId equals emp.EmployeeId
+                            where t.TerritoryDescription == "New York"
+                            select new
+                            {
+                                emp.EmployeeId,
+                                emp.FirstName,
+                                emp.LastName,
+                                emp.Address,
+                                emp.Country,
+                                emp.City,
+                                emp.BirthDate,
+                                emp.PhotoPath
+                            };
+
+                var employees = query.ToList();
+                return Ok(employees);
+            }
+        }
+
+        [HttpGet("OrderLast1998")]
+
+        public IActionResult OrderLast1998() {
+            using (var context = new NortwindContext())
+            {
+                var query = from o in context.Orders
+                            join c in context.Customers on o.CustomerId equals c.CustomerId
+                            where o.OrderDate > new DateTime(1998, 1, 1)
+                            orderby o.OrderDate ascending
+                            select new
+                            {
+                                o.OrderDate,
+                                c.ContactName
+                            };
+
+                var results = query.ToList();
+                return Ok(results);
+            }
+
+        }
+
+        [HttpPost("MakeRaise/{discountFactor}")]
+        public IActionResult MakeRaise(decimal discountFactor)
+        {
+            try
+            {
+                var products = _context.Products.ToList();
+
+                foreach (var product in products)
+                {
+                    product.UnitPrice = product.UnitPrice + (product.UnitPrice * discountFactor);
+                }
+
+                _context.SaveChanges();
+
+                return Ok($"Up to  % {discountFactor}  raise successfully done and saved");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error: {ex.Message}");
+            }
+        }
+
+        //ismi verilen ürünün fiyatına dışarıdan gelen sayı kadar zam yap
+        [HttpPost("UpdatePrice/{productName}/{increaseAmount}")]
+        public IActionResult UpdatePrice(string productName, decimal increaseAmount)
+        {
+            try
+            {
+                var product = _context.Products.FirstOrDefault(p => p.ProductName == productName);
+
+                if (product == null)
+                {
+                    return NotFound($"Ürün adı '{productName}' ile eşleşen ürün bulunamadı.");
+                }
+
+                product.UnitPrice += increaseAmount;
+
+                _context.SaveChanges();
+
+                return Ok($"Ürün '{productName}' fiyatına {increaseAmount} kadar zam yapıldı.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
+        }
+        //dışarıdan girilen kargo firmasıyla taşınmış, kargo ücreti 30 dan yüksek olan ve dışarıdan girilen yıla ait olan siparişlerin bilgilerini raporla
+        [HttpPost("ReportFreight")]
+        public IActionResult ReportFreight([FromBody] ReportFilter filtre)
+        {
+            try
+            {
+                var query = from o in _context.Orders
+                            join s in _context.Shippers on o.ShipVia equals s.ShipperId
+                            where s.CompanyName == filtre.Shipment
+                                  && o.Freight > filtre.MinShippingCost
+                                  && o.OrderDate.Value.Year == filtre.OrderYear
+                            select new
+                            {
+                                o.OrderId,
+                                o.ShipVia,
+                                o.Freight,
+                                o.OrderDate
+                            };
+
+                var results = query.ToList();
+
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
+        }
 
 
+        public class ReportFilter
+        {
+            public string Shipment { get; set; }
+            public decimal MinShippingCost { get; set; }
+            public int OrderYear { get; set; }
+        }
     }
 
 

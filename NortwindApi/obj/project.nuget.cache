@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "tgGBeUjoEECClt12/aa9EOZuMur3vTs2lousfZvToTTzs8MXNYON8LDwcKm68EAEDxWWU4xlJ9GIeVEIqjYu/Q==",
+  "dgSpecHash": "AotCaEtCuXCKJh7REaSKUDRfPCBC36bDKVIQXTE+TBmg+EF022u9s9t5gKeNaHBjbqIJgYrJFP00rEFP0LpcCg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\kamilcan\\Desktop\\e-commerce_client\\NortwindApi\\NortwindApi\\NortwindApi.csproj",
+  "projectFilePath": "C:\\Users\\kamilcan\\Desktop\\e-commerce_client\\NortwindApi\\NortwindApi_Project\\NortwindApi\\NortwindApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\kamilcan\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\kamilcan\\.nuget\\packages\\microsoft.csharp\\4.5.0\\microsoft.csharp.4.5.0.nupkg.sha512",

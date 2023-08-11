@@ -2446,11 +2446,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\kamilcan\\Desktop\\e-commerce_client\\NortwindApi\\NortwindApi\\NortwindApi.csproj",
+      "projectUniqueName": "C:\\Users\\kamilcan\\Desktop\\e-commerce_client\\NortwindApi\\NortwindApi_Project\\NortwindApi\\NortwindApi.csproj",
       "projectName": "NortwindApi",
-      "projectPath": "C:\\Users\\kamilcan\\Desktop\\e-commerce_client\\NortwindApi\\NortwindApi\\NortwindApi.csproj",
+      "projectPath": "C:\\Users\\kamilcan\\Desktop\\e-commerce_client\\NortwindApi\\NortwindApi_Project\\NortwindApi\\NortwindApi.csproj",
       "packagesPath": "C:\\Users\\kamilcan\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\kamilcan\\Desktop\\e-commerce_client\\NortwindApi\\NortwindApi\\obj\\",
+      "outputPath": "C:\\Users\\kamilcan\\Desktop\\e-commerce_client\\NortwindApi\\NortwindApi_Project\\NortwindApi\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -2465,7 +2465,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\sdk\\7.0.306\\Sdks\\Microsoft.NET.Sdk.Web\\library-packs": {},
+        "C:\\Program Files\\dotnet\\sdk\\7.0.307\\Sdks\\Microsoft.NET.Sdk.Web\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -2528,7 +2528,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.306\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.307\\RuntimeIdentifierGraph.json"
       }
     }
   }
