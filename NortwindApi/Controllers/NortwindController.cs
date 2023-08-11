@@ -8,7 +8,6 @@ using System.Text.Json;
 
 namespace NortwindApi.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
     public class NortwindController : ControllerBase
     {
@@ -230,11 +229,11 @@ namespace NortwindApi.Controllers
 
         }
 
-        [HttpGet("speedy")]
+        [HttpGet("SpeedyOrderNuncyAlfki")]
         public IActionResult SpeedyExpress()
         {
 
-            var speedy = _context.Orders.Where(t => t.EmployeeId == 1 && (t.CustomerId == "DUMON" || t.CustomerId == "ALFKI") && t.ShipVia == 1).ToList();
+            var speedy = _context.Orders.Where(t => t.EmployeeId == 1 && t.ShipVia == 1).ToList();
 
             return Ok(speedy);
         }
@@ -278,7 +277,7 @@ namespace NortwindApi.Controllers
 
         }
 
-        [HttpGet("SpeedyExpWithN")]
+        [HttpGet("SpeedyExpWithNancy")]
 
 
         public IActionResult SpeedyExpWithN()
@@ -300,7 +299,7 @@ namespace NortwindApi.Controllers
 
         public class CategoryViewModel
         {
-            public int CategoryID { get; set; }
+            public int CategoryId { get; set; }
             public string CategoryName { get; set; }
         }
 
@@ -499,6 +498,66 @@ namespace NortwindApi.Controllers
             {
                 return BadRequest($"Hata: {ex.Message}");
             }
+        }
+
+        [HttpGet("Tacoma")]
+        public IActionResult Tacoma()
+        {
+            var query = from o in _context.Orders
+                        join emp in _context.Employees on o.EmployeeId equals emp.EmployeeId
+                        where emp.City == "Tacoma"
+                        select o;
+
+            var results = query.ToList();   
+
+            return Ok(results); 
+        }
+
+        [HttpGet("BesSellerProduct")]
+
+        public IActionResult BesSellerProduct()
+        {
+            using (var context = new NortwindContext())
+            {
+                var query = from od in context.OrderDetails
+                            join p in context.Products on od.ProductId equals p.ProductId
+                            join c in context.Categories on p.CategoryId equals c.CategoryId
+                            group od by new { p.ProductId, p.ProductName, c.CategoryId, c.CategoryName } into g
+                            orderby g.Sum(x => x.Quantity) descending
+                            select new
+                            {
+                                ProductId = g.Key.ProductId,
+                                ProductName = g.Key.ProductName,
+                                NumberOfOrders = g.Count(),
+                                CategoryId = g.Key.CategoryId,
+                                CategoryName = g.Key.CategoryName,
+                                TotalQuantityOrdered = g.Sum(x => x.Quantity)
+                            };
+
+                var result = query.FirstOrDefault();
+                return Ok(result);
+            }
+        }
+
+        [HttpGet("ListBestOrders")]
+
+        public IActionResult ListBestOrders()
+        {
+            var query = from od in _context.OrderDetails
+                        join pr in _context.Products on od.ProductId equals pr.ProductId
+                        group od by new { pr.ProductId, pr.ProductName } into g
+                        orderby g.Sum(t => t.Quantity) descending
+                        select new
+                        {
+                            ProductId = g.Key.ProductId,
+                            ProductName = g.Key.ProductName,
+                            NumberOfOrders = g.Count(),
+                            TotalQuantityOrdered = g.Sum(x => x.Quantity)
+                        };
+
+                var result = query.ToList();
+
+            return Ok(result);
         }
 
 
