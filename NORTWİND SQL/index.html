@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Northwind Sql Sorguları</title>
+    <script src="main.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+  </head>
+  <body>
+
+    <!---------------------------------- NAVBAR ---------------------------------->
+    <nav class="navbar bg-body-tertiary">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">
+            <img src="northwind-footer-logo.png" width="100 px" class="m-3 col">
+
+            
+          </a>
+          <h1 class="text-uppercase col"> Sql sorgu ekranı</h1>
+        </div>
+    </nav>
+    <!---------------------------------- NAVBAR ---------------------------------->
+
+    <!---------------------------------- MAİN ---------------------------------->
+    <main>
+
+      <div class="container">
+        <div class="row justify-content-center align-items-center g-2">
+            
+
+            <div class="card text-center mt-5 mb-5">
+                <div class="card-header">
+                  SQL SORGULAR
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">Sorgulamak için seçin</h5>
+                        <div class="form-floating">
+                            <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                                <option selected>Sorgu Seçin</option>
+                                <option value="1">Tüm ürünlerin fiyatına dışarıdan gelen sayı kadar zam yap</option>
+                                <option value="2">ismi verilen ürünün fiyatına dışarıdan gelen sayı kadar zam yap</option>
+                                <option value="3">dışarıdan girilen kargo firmasıyla taşınmış, kargo ücreti 30 dan yüksek olan ve dışarıdan girilen yıla ait olan siparişlerin bilgilerini raporla</option>
+                                <option value="4">En çok sipariş veren 3 ülkeyi listele</option>
+                                <option value="5">Beverages kategorisine ait ürünleri getir</option>
+                                <option value="6">1997 yılındaki tüm cirom ne kadar</option>
+                                <option value="7">En çok kazandıran ilk 3 tedarikçiyi getir</option>
+                                <option value="8">Kargo şirketlerine göre taşınan sipariş sayıları</option>
+                                <option value="9">En az 15 sipariş vermiş müşterilerimin toplam sipariş adetini müşteri adı, müşteri ID verisi ve müşteri firmanın şehri ile birlikte raporla</option>
+                                <option value="11">Federal Shipping ile taşınmış olan siparişlerimi göster</option>
+                                <option value="12">Steven'in 97 mart ayında yaptığı satışların raporu</option>
+                                <option value="13">Speedy Express ile taşınmış Nancy'nin almış olduğu Dumon ya da Alfkı adlı müşterilerim tarafından verilmiş olan siparişleri getir</option>
+                                <option value="14">Almanyada yaşayan müşterilerimi getir</option>
+                                <option value="15">Tedarikçisinin posta kodu 33007 olan ürünlerimden deniz ürünleri (seafood) hariç ürünlerin yer aldığı siparişler ile ilgilenmiş çalışanlarımın ad, soyad, ev telefonu alanlarını getir</option>
+                                <option value="16">Speedy Express ile çalışmış ve Nancy'nin almış oldugu siparişleri göster</option>
+                                <option value="17">Konumu 'Eastern' olan müşterilerimin, federal shipping ile taşınan ürünlerini kategorilere göre sırala</option>
+                                <option value="18">Tedarik şehri londra olan, kargo şirketinin  4. harfi e olan stoğumda bulunan ve birim fiyatı 30 - 60 arasında olan siparişlerim neler</option>
+                                <option value="19">Satışı durdurulmuş ve aynı zamanda stoğu kalmamış ürünlerimin tedarikçilerinin isimlerini ve telefon numaralarını listele</option>
+                                <option value="20">New York şehrinden sorumlu çalışanlarım kimler</option>
+                                <option value="21">1 Ocak 1998 tarihinden sonra sipariş veren müşterilerimin isimlerini artan olarak sırala</option>
+                                <option value="22">Şehri tacoma olan çalışanlarımın aldığı siparişlerin listesi</option>
+                                <option value="23">En çok satan ürünün(adet olarak) kategori adini ve toplam satis adedini göster</option>
+                                <option value="24">Siparis detay tablosunun en çok siparisi verilen ürünlerini listele</option>
+                                <option value="25">Nancy'nin satmış olduğu ürünleri kategorileriyle birlikte müşteri isimleri ile getir</option>
+                                <option value="26">Ortalama (siparis bazli olarak) satis miktari üzerinde olan (para bazli olarak) satislari göster</option>
+                                <option value="27">Beverages kategorisine ait, Amerikalı toptancılardan alınmış, stoklarımda bulunan ürünlerin adlarını, ücretlerini ve KDV'li ücretlerini göster.</option>
+                                <option value="28">Müşterilerimin toplam sipariş adetlerini Müşteri adı ile birlikte raporla</option>
+                            </select>
+                            <label for="floatingSelect">Çalışması için seçin!</label>
+                        </div>
+
+                        <div id="inputContainer" style="display: none;">
+                            <div class="form-floating mt-3">
+                                <input type="text" class="form-control" id="inputValue" placeholder="Değer Girin">
+                                <label for="inputValue">Değer Girin</label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-floating mt-3">
+                            <button id="showBtn" class="btn btn-primary">Göster</button>
+                        </div>    
+          
+                        <div id="result" style="display: none;"></div>
+
+
+
+
+                        <div class="icerik">
+                
+                        </div>
+                </div>
+              </div>
+
+              
+              
+             
+        </div>
+      </div>
+    </main>
+<!---------------------------------- MAİN ---------------------------------->
+
+
+
+<!---------------------------------- FOOTER ---------------------------------->
+   <footer class="fixed-bottom bg-light text-center text-lg-start">
+        <div class="container-fluid p-4">
+            <div class="row">
+                <div class="col-4  mb-4 mb-md-0">
+                    <h5 class="text-uppercase text-center">Versiyon</h5>
+                    <p class="text-center">1.0.0</p>
+                </div>
+
+                <div class="col-4  mb-4 mb-md-0">
+                    <h5 class="text-uppercase text-center">Telif Hakkı</h5>
+                    <p class="text-center">© 2023 Tüm Hakları Saklıdır.</p>
+                </div>
+
+                <div class="col-4  mb-4 mb-md-0">
+                    <h5 class="text-uppercase text-center">Emeği Geçenler</h5>
+                    <ul class="list-unstyled mb-0 text-center">
+                    <li>
+                        <a href="#!" class="text-dark">Mehmet Ali Selek</a>
+                    </li>
+                    <li>
+                        <a href="#!" class="text-dark">Mehmet Emin Kayıhan</a>
+                    </li>
+                    <li>
+                        <a href="#!" class="text-dark">Kamil Can</a>
+                    </li>
+                    <li>
+                        <a href="#!" class="text-dark">Beyza Şimşek</a>
+                    </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+</footer>
+<!---------------------------------- FOOTER ---------------------------------->
+
+
+    <!---------------------------------- SCRİPT ---------------------------------->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+ 
+    
+    <!---------------------------------- SCRİPT ---------------------------------->
+
+</body>
+</html>
