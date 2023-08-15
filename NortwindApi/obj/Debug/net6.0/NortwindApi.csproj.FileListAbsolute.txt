@@ -130,3 +130,8 @@ C:\Users\kamilcan\Desktop\e-commerce_client\NortwindApi\NortwindApi_Project\Nort
 C:\Users\kamilcan\Desktop\e-commerce_client\NortwindApi\NortwindApi_Project\NortwindApi\obj\Debug\net6.0\NortwindApi.pdb
 C:\Users\kamilcan\Desktop\e-commerce_client\NortwindApi\NortwindApi_Project\NortwindApi\obj\Debug\net6.0\NortwindApi.genruntimeconfig.cache
 C:\Users\kamilcan\Desktop\e-commerce_client\NortwindApi\NortwindApi_Project\NortwindApi\obj\Debug\net6.0\ref\NortwindApi.dll
+C:\Users\kamilcan\Desktop\e-commerce_client\NortwindApi\NortwindApi_Project\NortwindApi\bin\Debug\net6.0\Aqua.dll
+C:\Users\kamilcan\Desktop\e-commerce_client\NortwindApi\NortwindApi_Project\NortwindApi\bin\Debug\net6.0\Aqua.Newtonsoft.Json.dll
+C:\Users\kamilcan\Desktop\e-commerce_client\NortwindApi\NortwindApi_Project\NortwindApi\bin\Debug\net6.0\Newtonsoft.Json.dll
+C:\Users\kamilcan\Desktop\e-commerce_client\NortwindApi\NortwindApi_Project\NortwindApi\bin\Debug\net6.0\Remote.Linq.dll
+C:\Users\kamilcan\Desktop\e-commerce_client\NortwindApi\NortwindApi_Project\NortwindApi\bin\Debug\net6.0\Remote.Linq.Newtonsoft.Json.dll

@@ -5,6 +5,10 @@ using NortwindApi.Models;
 using System.Reflection.Metadata.Ecma335;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using Newtonsoft.Json.Linq;
+using System.Net;
+using System.Diagnostics.Metrics;
+using System.Numerics;
 
 namespace NortwindApi.Controllers
 {
@@ -17,24 +21,38 @@ namespace NortwindApi.Controllers
         [HttpGet("TopSelling3")]
         public IActionResult TopSelling3()
         {
-            var topShipCountries = _context.Orders
-     .GroupBy(o => o.ShipCountry)
-     .Select(group => new
-     {
-         ShipCountry = group.Key,
-         OrderCount = group.Count()
-     })
-     .OrderByDescending(result => result.OrderCount)
-     .Take(3)
-     .ToList();
+            try
+            {
+                var topShipCountries = _context.Orders
+                    .GroupBy(o => o.ShipCountry)
+                    .Select(group => new
+                    {
+                        ShipCountry = group.Key,
+                        OrderCount = group.Count()
+                    })
+                    .OrderByDescending(result => result.OrderCount)
+                    .Take(3)
+                    .ToList();
 
-            return Ok(topShipCountries);
+                if (topShipCountries == null || topShipCountries.Count == 0)
+                {
+                    return NotFound("Veri bulunamadı.");
+                }
+
+                return Ok(topShipCountries);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
         }
 
         [HttpGet("GetBeveragesCategories")]
         public IActionResult GetBeveragesCategories()
         {
-            var productsInCategory1 = _context.Products
+            try
+            {
+                var productsInCategory1 = _context.Products
            .Where(p => p.CategoryId == 1)
            .OrderBy(p => p.ProductId)
            .Select(p => new
@@ -50,23 +68,26 @@ namespace NortwindApi.Controllers
                p.Discontinued
            })
            .ToList();
-
-            return Ok(productsInCategory1);
+                if (productsInCategory1 == null || productsInCategory1.Count == 0)
+                {
+                    return NotFound("Veri bulunamadı.");
+                }
+                return Ok(productsInCategory1);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
         }
 
-        [HttpGet("TotalRevenues1917")]
-        public IActionResult TotalRevenues1917()
-        {
-            var totalRevenues = _context.ProductSalesFor1997s
-            .Sum(ps => ps.ProductSales);
-
-            return Ok(totalRevenues);
-        }
+    
 
         [HttpGet("GetTop3Suppliers")]
         public IActionResult GetTop3Suppliers()
         {
-            var topSuppliers = _context.Suppliers
+            try
+            {
+                var topSuppliers = _context.Suppliers
     .Join(
         _context.AlphabeticalListOfProducts,
         s => s.SupplierId,
@@ -89,14 +110,26 @@ namespace NortwindApi.Controllers
     .Take(3)
     .ToList();
 
-            return Ok(topSuppliers);
+                if (topSuppliers == null || topSuppliers.Count == 0)
+                {
+                    return NotFound("Veri bulunamadı.");
+                }
+
+                return Ok(topSuppliers);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
         }
 
         [HttpGet("ShipperOrderCounts")]
         public IActionResult ShipperOrderCounts()
         {
+            try
+            {
 
-            var shipperOrderCounts = _context.Shippers
+                var shipperOrderCounts = _context.Shippers
     .Join(
         _context.Orders,
         s => s.ShipperId,
@@ -118,13 +151,25 @@ namespace NortwindApi.Controllers
     .OrderByDescending(result => result.OrderCount)
     .ToList();
 
-            return Ok(shipperOrderCounts);
+                if (shipperOrderCounts == null || shipperOrderCounts.Count == 0)
+                {
+                    return NotFound("Veri bulunamadı.");
+                }
+
+                return Ok(shipperOrderCounts);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
         }
 
         [HttpGet("CustomerOrdersLeast15")]
         public IActionResult CustomerOrdersLeast15()
         {
-            var customersWithTotalOrderCount = _context.Customers
+            try
+            {
+                var customersWithTotalOrderCount = _context.Customers
             .Join(
                 _context.Orders,
                 c => c.CustomerId,
@@ -151,47 +196,50 @@ namespace NortwindApi.Controllers
             .OrderByDescending(result => result.TotalOrderCount)
             .ToList();
 
-            return Ok(customersWithTotalOrderCount);
-        }
 
-        [HttpGet("CustomerNameAfter1917")]
-        public IActionResult CustomerNameAfter1917()
-        {
+                if (customersWithTotalOrderCount == null || customersWithTotalOrderCount.Count == 0)
+                {
+                    return NotFound("Veri bulunamadı.");
+                }
 
-            var customersWithRecentOrders = _context.Customers
-        .Join(
-            _context.Orders,
-            c => c.CustomerId,
-            o => o.CustomerId,
-            (c, o) => new
-            {
-                CustomerId = c.CustomerId,
-                ContactName = c.ContactName,
-                OrderDate = o.OrderDate
+
+                return Ok(customersWithTotalOrderCount);
             }
-        )
-        .Where(result => result.OrderDate > new DateTime(1998, 1, 1))
-        .OrderBy(result => result.OrderDate)
-        .Select(result => new
-        {
-            result.CustomerId,
-            result.ContactName,
-            result.OrderDate
-        })
-        .ToList();
-
-            return Ok(customersWithRecentOrders);
-
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
         }
+
+
+
         [HttpGet("ShippingWithFederal")]
         public IActionResult ShippingWithFederal()
         {
             try
             {
-                var query = from s in _context.Shippers
+                var query = from s in _context.Shippers                            
                             join o in _context.Orders on s.ShipperId equals o.ShipVia
+                            join emp in _context.Employees on o.EmployeeId equals emp.EmployeeId
+                            join cs in _context.Customers on o.CustomerId equals cs.CustomerId
                             where s.ShipperId == 3 && o.ShipVia == 3
-                            select s;
+                            select new
+                            {
+                                orderId = o.OrderId,
+                                customer = cs.CompanyName,
+                                employee = emp.FirstName,
+                                orderDate = o.OrderDate,
+                                shippedDate = o.ShippedDate,
+                                shipVia = s.CompanyName,
+                                freight = o.Freight,
+                                shipName = o.ShipName,
+                                shipCountry = o.ShipCountry,
+                                shipAddress = o.ShipAddress,
+                                shipCity = o.ShipCity,
+                                shipPostalCode = o.ShipPostalCode
+                                
+                            };
+                          
 
 
                 // JSON döngüsel referansları yönetmek için JsonSerializerOptions kullanın
@@ -201,13 +249,16 @@ namespace NortwindApi.Controllers
                     MaxDepth = 32
                 };
 
+                if (query == null)
+                {
+                    return NotFound("Veri bulunamadı.");
+                }
                 // JSON olarak serileştirilmiş veriyi döndürün
                 return Ok(query);
             }
             catch (Exception ex)
             {
-                // Hata durumunda 500 kodu ile cevap oluşturun
-                return StatusCode(500, "Internal Server Error: " + ex.Message);
+                return BadRequest($"Hata: {ex.Message}");
             }
         }
 
@@ -216,15 +267,37 @@ namespace NortwindApi.Controllers
         {
             try
             {
-                var orders = _context.Orders
-                    .Where(o => o.EmployeeId == 5 && o.OrderDate.Value.Year == 1997 && o.OrderDate.Value.Month == 03)
-                    .ToList();
+            
 
-                return Ok(orders);
+                var query = from o in _context.Orders
+                            join em in _context.Employees on o.EmployeeId equals em.EmployeeId
+                            join sh in _context.Shippers on o.ShipVia equals sh.ShipperId
+                            where o.EmployeeId == 5 && o.OrderDate.Value.Year == 1997 && o.OrderDate.Value.Month == 03
+                            select new
+                            {
+                                orderID = o.OrderId,
+                                employeeName = em.FirstName,
+                                orderDate = o.OrderDate,
+                                shippedDate = o.ShippedDate,
+                                shipVia = sh.CompanyName,
+                                freight = o.Freight,
+                                shipName = o.ShipName,
+                                shipAddress = o.ShipAddress,
+                                shipCity = o.ShipCity,
+                                shipCountry = o.ShipCountry
+
+                            };
+
+                if (query == null || query.Count() == 0)
+                {
+                    return NotFound("Veri bulunamadı.");
+                }
+
+                return Ok(query);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Internal Server Error: " + ex.Message);
+                return BadRequest($"Hata: {ex.Message}");
             }
 
         }
@@ -232,10 +305,42 @@ namespace NortwindApi.Controllers
         [HttpGet("SpeedyOrderNuncyAlfki")]
         public IActionResult SpeedyExpress()
         {
+            try
+            {
 
-            var speedy = _context.Orders.Where(t => t.EmployeeId == 1 && t.ShipVia == 1).ToList();
+                var query = from o in _context.Orders
+                            join emp in _context.Employees on o.EmployeeId equals emp.EmployeeId 
+                            join sh in _context.Shippers on o.ShipVia equals sh.ShipperId
+                            select new
+                            {
+                                orderıd = o.OrderId,
+                                customerıd = emp.FirstName,
+                                orderDate = o.OrderDate,
+                                shippedDate = o.ShippedDate,
+                                shipVia = sh.CompanyName,
+                                freight = o.Freight,
+                                shipName = o.ShipName,
+                                shipAddress = o.ShipAddress,
+                                shipCity = o.ShipCity,
+                                shipCountry = o.ShipCountry,
 
-            return Ok(speedy);
+                            };
+
+            
+
+
+                if (query == null || query.Count() == 0)
+                {
+                    return NotFound("Veri bulunamadı.");
+                }
+
+
+                return Ok(query);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
         }
 
 
@@ -243,36 +348,68 @@ namespace NortwindApi.Controllers
 
         public IActionResult GetGermanyCustomer()
         {
+            try
+            {
+                var query = from c in _context.Customers
+                            select new
+                            {
+                                customerId=c.CustomerId,
+                                companyName=c.CompanyName,
+                                contactName=c.ContactName,
+                                contactTitle = c.ContactTitle,
+                                address  = c.Address,
+                                city = c.City,
+                                postalCode = c.PostalCode,
+                                country  = c.Country,
+                                phone = c.Phone,
+                                fax = c.Fax,
+                            };
 
 
-            return Ok(_context.Customers.Where(i => i.Country == "Germany").ToList());
-
+                return Ok(query);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
         }
 
         [HttpGet("Seafood")]
 
         public IActionResult Seafood()
         {
-            var query = from p in _context.Products
-                        join s in _context.Suppliers on p.SupplierId equals s.SupplierId
-                        join c in _context.Categories on p.CategoryId equals c.CategoryId
-                        join d in _context.OrderDetails on p.ProductId equals d.ProductId
-                        join o in _context.Orders on d.OrderId equals o.OrderId
-                        join e in _context.Employees on o.EmployeeId equals e.EmployeeId
-                        where c.CategoryId != 8 && s.PostalCode == "33007"
-                        select new
-                        {
-                            EmployeeInfo = new
+            try
+            {
+                var query = from p in _context.Products
+                            join s in _context.Suppliers on p.SupplierId equals s.SupplierId
+                            join c in _context.Categories on p.CategoryId equals c.CategoryId
+                            join d in _context.OrderDetails on p.ProductId equals d.ProductId
+                            join o in _context.Orders on d.OrderId equals o.OrderId
+                            join e in _context.Employees on o.EmployeeId equals e.EmployeeId
+                            where c.CategoryId != 8 && s.PostalCode == "33007"
+                            select new
                             {
-                                FirstName = e.FirstName,
-                                LastName = e.LastName,
-                                HomePhone = e.HomePhone
-                            }
-                        };
+                              
+                                    FirstName = e.FirstName,
+                                    LastName = e.LastName,
+                                    HomePhone = e.HomePhone
+                                
+                            };
 
-            var distinctEmployeeInfo = query.Distinct().ToList();
+                var distinctEmployeeInfo = query.Distinct().ToList();
 
-            return Ok(distinctEmployeeInfo);
+
+                if (distinctEmployeeInfo == null || distinctEmployeeInfo.Count == 0)
+                {
+                    return NotFound("Veri bulunamadı.");
+                }
+
+                return Ok(distinctEmployeeInfo);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
 
 
         }
@@ -282,18 +419,44 @@ namespace NortwindApi.Controllers
 
         public IActionResult SpeedyExpWithN()
         {
+            try
+            {
+                var query = from o in _context.Orders
+                            join sh in _context.Shippers on o.ShipVia equals sh.ShipperId
+                            join emp in _context.Employees on o.EmployeeId equals emp.EmployeeId
+                            join cst in _context.Customers on o.CustomerId equals cst.CustomerId
+                            where (sh.ShipperId == 1 && emp.EmployeeId == 1 && (cst.CustomerId == "ALFKI" || cst.CustomerId == "DUMON"))
+                            select new
+                            {
+                                orderId = o.OrderId,
+                                customerId = o.CustomerId,
+                                employeeName = emp.FirstName,
+                                orderDate = o.OrderDate,
+                                shippedDate = o.ShippedDate,
+                                shipVia = sh.CompanyName,
+                                freiht = o.Freight,
+                                shipName = o.ShipName,
+                                shipAddress = o.ShipAddress,
+                                shipCity = o.ShipCity,
+                                shipCountry = o.ShipCountry
 
-            var query = from o in _context.Orders
-                        join sh in _context.Shippers on o.ShipVia equals sh.ShipperId
-                        join emp in _context.Employees on o.EmployeeId equals emp.EmployeeId
-                        join cst in _context.Customers on o.CustomerId equals cst.CustomerId
-                        where (sh.ShipperId == 1 && emp.EmployeeId == 1 && (cst.CustomerId == "ALFKI" || cst.CustomerId == "DUMON"))
-                        select o;
+                            };
 
-            var orders = query.ToList();
+                var orders = query.ToList();
 
-            return Ok(orders);
 
+                if (orders == null || orders.Count == 0)
+                {
+                    return NotFound("Veri bulunamadı.");
+                }
+
+
+                return Ok(orders);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
 
         }
 
@@ -303,126 +466,204 @@ namespace NortwindApi.Controllers
             public string CategoryName { get; set; }
         }
 
-        [HttpGet("Eastren")]
-        public IActionResult Eastren()
+        [HttpGet("Eastern")]
+        public IActionResult Eastern()
         {
-            using (var context = new NortwindContext())
+            try
             {
-                var query = from cts in context.Categories
-                            join prd in context.Products on cts.CategoryId equals prd.CategoryId
-                            join ordt in context.OrderDetails on prd.ProductId equals ordt.ProductId
-                            join ord in context.Orders on ordt.OrderId equals ord.OrderId
-                            join cst in context.Customers on ord.CustomerId equals cst.CustomerId
-                            join emp in context.Employees on ord.EmployeeId equals emp.EmployeeId
-                            join empt in context.EmployeeTerritories on emp.EmployeeId equals empt.EmployeeId
-                            join tr in context.Territories on empt.TerritoryId equals tr.TerritoryId
-                            join r in context.Regions on tr.RegionId equals r.RegionId
-                            join shp in context.Shippers on ord.ShipVia equals shp.ShipperId
-                            where r.RegionDescription == "Eastern" && shp.ShipperId == 3
-                            select new{
-                    cts.CategoryId,cts.CategoryName
+                using (var context = new NortwindContext())
+                {
+                    var query = from cts in context.Categories
+                                join prd in context.Products on cts.CategoryId equals prd.CategoryId
+                                join ordt in context.OrderDetails on prd.ProductId equals ordt.ProductId
+                                join ord in context.Orders on ordt.OrderId equals ord.OrderId
+                                join cst in context.Customers on ord.CustomerId equals cst.CustomerId
+                                join emp in context.Employees on ord.EmployeeId equals emp.EmployeeId
+                                join empt in context.EmployeeTerritories on emp.EmployeeId equals empt.EmployeeId
+                                join tr in context.Territories on empt.TerritoryId equals tr.TerritoryId
+                                join r in context.Regions on tr.RegionId equals r.RegionId
+                                join shp in context.Shippers on ord.ShipVia equals shp.ShipperId
+                                where r.RegionDescription == "Eastern" && shp.ShipperId == 3
+                                select new
+                                {
+                                    cts.CategoryId,
+                                    cts.CategoryName
+                                }
+                        ;
+
+                    var categories = query.Distinct().ToList();
+
+                    if (categories == null || categories.Count == 0)
+                    {
+                        return NotFound("Veri bulunamadı.");
+                    }
+
+                    return Ok(categories);
                 }
-                    ;
-
-                var categories = query.ToList();
-  
-
-                return Ok(categories);
             }
-           
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
+
         }
 
         [HttpGet("ShippersLondon")]
         public IActionResult ShippersLondon()
         {
-            using (var context = new NortwindContext())
+            try
             {
-                var query = from o in context.Orders
-                            join s in context.Shippers on o.ShipVia equals s.ShipperId
-                            join odt in context.OrderDetails on o.OrderId equals odt.OrderId
-                            join prd in context.Products on odt.ProductId equals prd.ProductId
-                            join spp in context.Suppliers on prd.SupplierId equals spp.SupplierId
-                            where spp.City == "London" && s.CompanyName.EndsWith("e")
-                                  && prd.UnitsInStock > 0 && prd.UnitPrice >= 10 && prd.UnitPrice <= 60
-                            select new
-                            {
-                                s.CompanyName,
-                                spp.City,
-                                prd.UnitsInStock,
-                                prd.UnitPrice,
-                                o
-                            };
+                using (var context = new NortwindContext())
+                {
+                    var query = from o in context.Orders
+                                join emp in context.Employees on o.EmployeeId equals emp.EmployeeId
+                                join s in context.Shippers on o.ShipVia equals s.ShipperId
+                                join odt in context.OrderDetails on o.OrderId equals odt.OrderId
+                                join prd in context.Products on odt.ProductId equals prd.ProductId
+                                join spp in context.Suppliers on prd.SupplierId equals spp.SupplierId
+                                where spp.City == "London" && s.CompanyName.EndsWith("e")
+                                      && prd.UnitsInStock > 0 && prd.UnitPrice >= 10 && prd.UnitPrice <= 300
+                                select new
+                                {
+                                    orderId = o.OrderId,
+                                    customerId = o.CustomerId,
+                                    employeeName = emp.FirstName,
+                                    orderDate = o.OrderDate,
+                                    shippedDate = o.ShippedDate,
+                                    shipVia = s.CompanyName,
+                                    freiht = o.Freight,
+                                    shipName = o.ShipName,
+                                    shipAddress = o.ShipAddress,
+                                    shipCity = o.ShipCity,
+                                    shipCountry = o.ShipCountry
 
-                var results = query.ToList();
-                return Ok(results);
+                                };
+
+                    var results = query.ToList();
+
+                    if (results == null || results.Count == 0)
+                    {
+                        return NotFound("Veri bulunamadı.");
+                    }
+
+
+                    return Ok(results);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
             }
         }
 
         [HttpGet("DiscontinuedSale")]
         public IActionResult DiscontinuedSale()
         {
-            using (var context = new NortwindContext())
+            try
             {
-                var query = from prd in context.Products
-                            join s in context.Suppliers on prd.SupplierId equals s.SupplierId
-                            where prd.Discontinued && prd.UnitsInStock == 0
-                            select new
-                            {
-                                s.ContactName,
-                                s.Phone
-                            };
+                using (var context = new NortwindContext())
+                {
+                    var query = from prd in context.Products
+                                join s in context.Suppliers on prd.SupplierId equals s.SupplierId
+                                where prd.Discontinued && prd.UnitsInStock == 0
+                                select new
+                                {
+                                    s.ContactName,
+                                    s.Phone
+                                };
 
-                var results = query.ToList();
-                return Ok(results);
+                    var results = query.ToList();
+
+                    if (results == null || results.Count == 0)
+                    {
+                        return NotFound("Veri bulunamadı.");
+                    }
+
+
+                    return Ok(results);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
             }
         }
 
         [HttpGet("NewYorkManager")]
 
-        public IActionResult NewYorkManager() {
-
-            using (var context = new NortwindContext())
+        public IActionResult NewYorkManager()
+        {
+            try
             {
-                var query = from t in context.Territories
-                            join empt in context.EmployeeTerritories on t.TerritoryId equals empt.TerritoryId
-                            join emp in context.Employees on empt.EmployeeId equals emp.EmployeeId
-                            where t.TerritoryDescription == "New York"
-                            select new
-                            {
-                                emp.EmployeeId,
-                                emp.FirstName,
-                                emp.LastName,
-                                emp.Address,
-                                emp.Country,
-                                emp.City,
-                                emp.BirthDate,
-                                emp.PhotoPath
-                            };
+                using (var context = new NortwindContext())
+                {
+                    var query = from t in context.Territories
+                                join empt in context.EmployeeTerritories on t.TerritoryId equals empt.TerritoryId
+                                join emp in context.Employees on empt.EmployeeId equals emp.EmployeeId
+                                where t.TerritoryDescription == "New York"
+                                select new
+                                {
+                                    emp.EmployeeId,
+                                    emp.FirstName,
+                                    emp.LastName,
+                                    emp.Address,
+                                    emp.Country,
+                                    emp.City,
+                                    emp.BirthDate,
+                                    emp.PhotoPath
+                                };
 
-                var employees = query.ToList();
-                return Ok(employees);
+                    var employees = query.ToList();
+
+                    if (employees == null || employees.Count == 0)
+                    {
+                        return NotFound("Veri bulunamadı.");
+                    }
+
+
+
+                    return Ok(employees);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
             }
         }
 
         [HttpGet("OrderLast1998")]
 
-        public IActionResult OrderLast1998() {
-            using (var context = new NortwindContext())
+        public IActionResult OrderLast1998()
+        {
+            try
             {
-                var query = from o in context.Orders
-                            join c in context.Customers on o.CustomerId equals c.CustomerId
-                            where o.OrderDate > new DateTime(1998, 1, 1)
-                            orderby o.OrderDate ascending
-                            select new
-                            {
-                                o.OrderDate,
-                                c.ContactName
-                            };
+                using (var context = new NortwindContext())
+                {
+                    var query = from o in context.Orders
+                                join c in context.Customers on o.CustomerId equals c.CustomerId
+                                where o.OrderDate > new DateTime(1998, 1, 1)
+                                orderby o.OrderDate ascending
+                                select new
+                                {
+                                    o.OrderDate,
+                                    c.ContactName
+                                };
 
-                var results = query.ToList();
-                return Ok(results);
+                    var results = query.ToList();
+
+                    if (results == null || results.Count == 0)
+                    {
+                        return NotFound("Veri bulunamadı.");
+                    }
+
+
+                    return Ok(results);
+                }
             }
-
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
         }
 
         [HttpPost("MakeRaise/{discountFactor}")]
@@ -434,19 +675,20 @@ namespace NortwindApi.Controllers
 
                 foreach (var product in products)
                 {
-                    product.UnitPrice = product.UnitPrice + (product.UnitPrice * discountFactor);
+                    product.UnitPrice = product.UnitPrice - product.UnitPrice * ( (discountFactor / 100));
                 }
 
                 _context.SaveChanges();
 
-                return Ok($"Up to  % {discountFactor}  raise successfully done and saved");
+                return Ok(new { message = $"Ürün fiyatlarına %{discountFactor} oranında indirim yapıldı ve kaydedildi." });
             }
             catch (Exception ex)
             {
-                return BadRequest($"Error: {ex.Message}");
+                return BadRequest(new { message = $"Hata: {ex.Message}" });
             }
-        }
 
+
+        }
         //ismi verilen ürünün fiyatına dışarıdan gelen sayı kadar zam yap
         [HttpPost("UpdatePrice/{productName}/{increaseAmount}")]
         public IActionResult UpdatePrice(string productName, decimal increaseAmount)
@@ -457,19 +699,20 @@ namespace NortwindApi.Controllers
 
                 if (product == null)
                 {
-                    return NotFound($"Ürün adı '{productName}' ile eşleşen ürün bulunamadı.");
+                    return NotFound(new { message = $"Ürün adı '{productName}' ile eşleşen ürün bulunamadı." });
                 }
 
                 product.UnitPrice += increaseAmount;
 
                 _context.SaveChanges();
 
-                return Ok($"Ürün '{productName}' fiyatına {increaseAmount} kadar zam yapıldı.");
+                return Ok(new { message = $"Ürün '{productName}' fiyatına {increaseAmount} kadar zam yapıldı." });
             }
             catch (Exception ex)
             {
-                return BadRequest($"Hata: {ex.Message}");
+                return BadRequest(new { message = $"Hata: {ex.Message}" });
             }
+
         }
         //dışarıdan girilen kargo firmasıyla taşınmış, kargo ücreti 30 dan yüksek olan ve dışarıdan girilen yıla ait olan siparişlerin bilgilerini raporla
         [HttpPost("ReportFreight")]
@@ -492,6 +735,48 @@ namespace NortwindApi.Controllers
 
                 var results = query.ToList();
 
+                return Ok(   results ); // JSON olarak raporu döndür
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = $"Hata: {ex.Message}" });
+            }
+        }
+        [HttpGet("Tacoma")]
+        public IActionResult Tacoma()
+        {
+
+            try
+            {
+
+                var query = from o in _context.Orders
+                            join emp in _context.Employees on o.EmployeeId equals emp.EmployeeId
+                            join sh in _context.Shippers on o.ShipVia equals sh.ShipperId
+                            where emp.City == "Tacoma"
+                            select new
+                            {
+                                orderId = o.OrderId,
+                                customerId = o.CustomerId,
+                                employeeName = emp.FirstName,
+                                orderDate = o.OrderDate,
+                                shippedDate = o.ShippedDate,
+                                shipVia = sh.CompanyName,
+                                freiht = o.Freight,
+                                shipName = o.ShipName,
+                                shipAddress = o.ShipAddress,
+                                shipCity = o.ShipCity,
+                                shipCountry = o.ShipCountry
+
+                            };
+
+
+                var results = query.ToList();
+
+                if (results == null || results.Count == 0)
+                {
+                    return NotFound("Veri bulunamadı.");
+                }
+
                 return Ok(results);
             }
             catch (Exception ex)
@@ -500,42 +785,77 @@ namespace NortwindApi.Controllers
             }
         }
 
-        [HttpGet("Tacoma")]
-        public IActionResult Tacoma()
+        [HttpGet("BestSellerProduct")]
+
+        public IActionResult BestSellerProduct()
         {
-            var query = from o in _context.Orders
-                        join emp in _context.Employees on o.EmployeeId equals emp.EmployeeId
-                        where emp.City == "Tacoma"
-                        select o;
+            try
+            {
+                using (var context = new NortwindContext())
+                {
+                    var query = from od in context.OrderDetails
+                                join p in context.Products on od.ProductId equals p.ProductId
+                                join c in context.Categories on p.CategoryId equals c.CategoryId
+                                group od by new { p.ProductId, p.ProductName, c.CategoryId, c.CategoryName } into g
+                                orderby g.Sum(x => x.Quantity) descending
+                                select new
+                                {
+                                    ProductId = g.Key.ProductId,
+                                    ProductName = g.Key.ProductName,
+                                    NumberOfOrders = g.Count(),
+                                    CategoryId = g.Key.CategoryId,
+                                    CategoryName = g.Key.CategoryName,
+                                    TotalQuantityOrdered = g.Sum(x => x.Quantity)
+                                };
 
-            var results = query.ToList();   
+                    var result = query.ToList().Take(1);
 
-            return Ok(results); 
+                    if (result == null )
+                    {
+                        return NotFound("Veri bulunamadı.");
+                    }
+
+                    return Ok(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
         }
 
-        [HttpGet("BesSellerProduct")]
-
-        public IActionResult BesSellerProduct()
+        [HttpGet("TotalRevenues1997")]
+        public IActionResult TotalRevenues1997()
         {
-            using (var context = new NortwindContext())
+            try
             {
-                var query = from od in context.OrderDetails
-                            join p in context.Products on od.ProductId equals p.ProductId
-                            join c in context.Categories on p.CategoryId equals c.CategoryId
-                            group od by new { p.ProductId, p.ProductName, c.CategoryId, c.CategoryName } into g
-                            orderby g.Sum(x => x.Quantity) descending
-                            select new
-                            {
-                                ProductId = g.Key.ProductId,
-                                ProductName = g.Key.ProductName,
-                                NumberOfOrders = g.Count(),
-                                CategoryId = g.Key.CategoryId,
-                                CategoryName = g.Key.CategoryName,
-                                TotalQuantityOrdered = g.Sum(x => x.Quantity)
-                            };
+                using (var context = new NortwindContext())
+                {
+                    //var totalUnitPrice = context.OrderDetails
+                    //    .Join(context.Orders, od => od.OrderId, o => o.OrderId, (od, o) => new { OrderDetail = od, Order = o })
+                    //    .Where(entry => entry.Order.OrderDate.HasValue && entry.Order.OrderDate.Value.Year < 1997)
+                    //    .Sum(entry => entry.OrderDetail.UnitPrice);
+                        
+                    var query = from od in context.OrderDetails
+                                join o in context.Orders on od.OrderId equals o.OrderId
+                                where o.OrderDate.HasValue && o.OrderDate.Value.Year < 1997
+                                select od.UnitPrice;
 
-                var result = query.FirstOrDefault();
-                return Ok(result);
+
+                    var totalUnitPrice = query.Sum();
+
+                    var response = new
+                    {
+                        totalUnitPrice = totalUnitPrice
+                    };
+                    string jsonResponse = Newtonsoft.Json.JsonConvert.SerializeObject(response);
+
+                    return Ok("["+jsonResponse+"]");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
             }
         }
 
@@ -543,24 +863,212 @@ namespace NortwindApi.Controllers
 
         public IActionResult ListBestOrders()
         {
-            var query = from od in _context.OrderDetails
-                        join pr in _context.Products on od.ProductId equals pr.ProductId
-                        group od by new { pr.ProductId, pr.ProductName } into g
-                        orderby g.Sum(t => t.Quantity) descending
-                        select new
-                        {
-                            ProductId = g.Key.ProductId,
-                            ProductName = g.Key.ProductName,
-                            NumberOfOrders = g.Count(),
-                            TotalQuantityOrdered = g.Sum(x => x.Quantity)
-                        };
+            try
+            {
+                var query = from od in _context.OrderDetails
+                            join pr in _context.Products on od.ProductId equals pr.ProductId
+                            group od by new { pr.ProductId, pr.ProductName } into g
+                            orderby g.Sum(t => t.Quantity) descending
+                            select new
+                            {
+                                ProductId = g.Key.ProductId,
+                                ProductName = g.Key.ProductName,
+                                NumberOfOrders = g.Count(),
+                                TotalQuantityOrdered = g.Sum(x => x.Quantity)
+                            };
 
                 var result = query.ToList();
 
-            return Ok(result);
+                if (result == null || result.Count == 0)
+                {
+                    return NotFound("Veri bulunamadı.");
+                }
+
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
+        }
+
+        [HttpGet("NancysProducts")]
+        public IActionResult NancysProducts()
+        {
+            try
+            {
+                var result = (from o in _context.Orders
+                          join e in _context.Employees on o.EmployeeId equals e.EmployeeId
+                          join od in _context.OrderDetails on o.OrderId equals od.OrderId
+                          join p in _context.Products on od.ProductId equals p.ProductId
+                          join c in _context.Categories on p.CategoryId equals c.CategoryId
+                          join cm in _context.Customers on o.CustomerId equals cm.CustomerId
+
+                          where e.FirstName == "Nancy"
+                          select new
+                          {
+                              firstName = e.FirstName,
+                              productName = p.ProductName,
+                              categoryName = c.CategoryName,
+                              customerName = cm.ContactName
+                          }).ToList();
+                if (result == null || result.Count == 0)
+                {
+                    return NotFound("Veri bulunamadı.");
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
         }
 
 
+        [HttpGet("HighAverageSales")]
+        public IActionResult HighAverageSales()
+        {
+            try
+            {
+                var highAverageSales = _context.OrderDetails
+             .Join(
+                 _context.Orders,
+                 od => od.OrderId,
+                 o => o.OrderId,
+                 (od, o) => new { OrderDetail = od, Order = o }
+             )
+             .Where(result => result.OrderDetail.Quantity > _context.OrderDetails.Average(od => od.Quantity))
+             .Select(result => new
+             {
+                 result.OrderDetail.Quantity,
+                 result.OrderDetail.UnitPrice,
+                 result.Order.OrderId,
+                 result.Order.CustomerId,
+                 result.Order.EmployeeId,
+                 result.Order.OrderDate,
+                 result.Order.RequiredDate,
+                 result.Order.ShippedDate,
+                 result.Order.ShipVia,
+                 result.Order.Freight,
+                 result.Order.ShipName,
+                 result.Order.ShipAddress,
+                 result.Order.ShipCity,
+                 result.Order.ShipPostalCode,
+                 result.Order.ShipCountry
+             })
+             .ToList();
+                if (highAverageSales == null || highAverageSales.Count == 0)
+                {
+                    return NotFound("Veri bulunamadı.");
+                }
+
+                return Ok(highAverageSales);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
+        }
+
+        [HttpGet("USASuplliersBeverages")]
+        public IActionResult USASuplliersBeverages()
+        {
+            try
+            {
+                var usaBeveragesProducts = (from p in _context.Products
+                                            join c in _context.Categories on p.CategoryId equals c.CategoryId
+                                            join s in _context.Suppliers on p.SupplierId equals s.SupplierId
+                                            where c.CategoryName == "Beverages" && p.UnitsInStock > 0 && s.Country == "USA"
+                                            select new
+                                            {
+                                                ProductName = p.ProductName,
+                                                IncreasedPrice = Math.Round(Convert.ToDouble(p.UnitPrice) * 1.2, 2),
+                                                UnitPrice = p.UnitPrice,
+                                                UnitsInStock = p.UnitsInStock,
+                                                SupplierId = p.SupplierId,
+                                                CategoryName = c.CategoryName,
+                                                Country = s.Country
+
+                                            }).ToList();
+
+                if (usaBeveragesProducts == null || usaBeveragesProducts.Count() == 0)
+                    return NotFound("Veri bulunamadı.");
+
+
+                return Ok(usaBeveragesProducts);
+
+            }
+            catch(Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
+        }
+
+        [HttpGet("TotalOrderCount")]
+        public IActionResult TotalOrderCount()
+        {
+            var TOrderCount = _context.Customers
+    .Join(
+        _context.Orders,
+        c => c.CustomerId,
+        o => o.CustomerId,
+        (c, o) => new
+        {
+            CustomerId = c.CustomerId,
+            ContactName = c.ContactName,
+            OrderCount = o.CustomerId
+        }
+    )
+    .GroupBy(result => new { result.CustomerId, result.ContactName })
+    .Select(group => new
+    {
+        CustomerId = group.Key.CustomerId,
+        ContactName = group.Key.ContactName,
+        TotalOrderCount = group.Count()
+    })
+    .OrderByDescending(result => result.TotalOrderCount)
+    .ToList();
+
+            return Ok(TOrderCount);
+        }
+
+        [HttpGet("ProductTypeCount")]
+        public IActionResult ProductTypeCount()
+        {
+            try
+            {
+
+                var query = from o in _context.Orders
+                            join ord in _context.OrderDetails on o.OrderId equals ord.OrderId
+                            join prd in _context.Products on ord.ProductId equals prd.ProductId
+                            group new { o, prd, ord } by new { o.OrderDate, prd.ProductName } into grouped
+                            orderby grouped.Key.OrderDate
+                            select new
+                            {
+                                OrderDate = grouped.Key.OrderDate,
+                                ProductName = grouped.Key.ProductName,
+                                Quantity = grouped.Sum(x => x.ord.Quantity)
+                            };
+
+                if (query == null || query.Count() == 0)
+                    return NotFound("Veri bulunamadı.");
+                
+
+
+
+                return Ok(query);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Hata: {ex.Message}");
+            }
+
+        }
+
+
+  
         public class ReportFilter
         {
             public string Shipment { get; set; }
