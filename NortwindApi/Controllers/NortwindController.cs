@@ -507,19 +507,19 @@ namespace NortwindApi.Controllers
             }
 
         }
-
         [HttpGet("ShippersLondon")]
         public IActionResult ShippersLondon()
         {
             try
             {
-
-                    var query = from o in _context.Orders
-                                join emp in _context.Employees on o.EmployeeId equals emp.EmployeeId
-                                join s in _context.Shippers on o.ShipVia equals s.ShipperId
-                                join odt in _context.OrderDetails on o.OrderId equals odt.OrderId
-                                join prd in _context.Products on odt.ProductId equals prd.ProductId
-                                join spp in _context.Suppliers on prd.SupplierId equals spp.SupplierId
+                using (var context = new NortwindContext())
+                {
+                    var query = from o in context.Orders
+                                join emp in context.Employees on o.EmployeeId equals emp.EmployeeId
+                                join s in context.Shippers on o.ShipVia equals s.ShipperId
+                                join odt in context.OrderDetails on o.OrderId equals odt.OrderId
+                                join prd in context.Products on odt.ProductId equals prd.ProductId
+                                join spp in context.Suppliers on prd.SupplierId equals spp.SupplierId
                                 where spp.City == "London" && s.CompanyName.EndsWith("e")
                                       && prd.UnitsInStock > 0 && prd.UnitPrice >= 10 && prd.UnitPrice <= 300
                                 select new
@@ -547,22 +547,22 @@ namespace NortwindApi.Controllers
 
 
                     return Ok(results);
-                
+                }
             }
             catch (Exception ex)
             {
                 return BadRequest($"Hata: {ex.Message}");
             }
         }
-
         [HttpGet("DiscontinuedSale")]
         public IActionResult DiscontinuedSale()
         {
             try
             {
-                
-                    var query = from prd in _context.Products
-                                join s in _context.Suppliers on prd.SupplierId equals s.SupplierId
+                using (var context = new NortwindContext())
+                {
+                    var query = from prd in context.Products
+                                join s in context.Suppliers on prd.SupplierId equals s.SupplierId
                                 where prd.Discontinued && prd.UnitsInStock == 0
                                 select new
                                 {
@@ -579,7 +579,7 @@ namespace NortwindApi.Controllers
 
 
                     return Ok(results);
-                
+                }
             }
             catch (Exception ex)
             {
