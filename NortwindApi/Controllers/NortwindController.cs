@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Diagnostics.Metrics;
 using System.Numerics;
+using System.Security.Cryptography.Xml;
 
 namespace NortwindApi.Controllers
 {
@@ -228,7 +229,7 @@ namespace NortwindApi.Controllers
                                 orderId = o.OrderId,
                                 customer = cs.CompanyName,
                                 employee = emp.FirstName,
-                                orderDate = o.OrderDate,
+                                orderDate = o.OrderDate.Value.ToString("dd/MM/yyyy"),
                                 shippedDate = o.ShippedDate,
                                 shipVia = s.CompanyName,
                                 freight = o.Freight,
@@ -277,7 +278,7 @@ namespace NortwindApi.Controllers
                             {
                                 orderID = o.OrderId,
                                 employeeName = em.FirstName,
-                                orderDate = o.OrderDate,
+                                orderDate = o.OrderDate.Value.ToString("dd/MM/yyyy"),
                                 shippedDate = o.ShippedDate,
                                 shipVia = sh.CompanyName,
                                 freight = o.Freight,
@@ -315,7 +316,7 @@ namespace NortwindApi.Controllers
                             {
                                 orderıd = o.OrderId,
                                 customerıd = emp.FirstName,
-                                orderDate = o.OrderDate,
+                                orderDate = o.OrderDate.Value.ToString("dd/MM/yyyy"),
                                 shippedDate = o.ShippedDate,
                                 shipVia = sh.CompanyName,
                                 freight = o.Freight,
@@ -431,7 +432,7 @@ namespace NortwindApi.Controllers
                                 orderId = o.OrderId,
                                 customerId = o.CustomerId,
                                 employeeName = emp.FirstName,
-                                orderDate = o.OrderDate,
+                                orderDate = o.OrderDate.Value.ToString("dd/MM/yyyy"),
                                 shippedDate = o.ShippedDate,
                                 shipVia = sh.CompanyName,
                                 freiht = o.Freight,
@@ -528,7 +529,7 @@ namespace NortwindApi.Controllers
                                     orderId = o.OrderId,
                                     customerId = o.CustomerId,
                                     employeeName = emp.FirstName,
-                                    orderDate = o.OrderDate,
+                                    orderDate = o.OrderDate.Value.ToString("dd/MM/yyyy"),
                                     shippedDate = o.ShippedDate,
                                     shipVia = s.CompanyName,
                                     freiht = o.Freight,
@@ -680,7 +681,9 @@ namespace NortwindApi.Controllers
 
                 _context.SaveChanges();
 
-                return Ok(new { message = $"Ürün fiyatlarına %{discountFactor} oranında indirim yapıldı ve kaydedildi." });
+                var get5Products = products.Take(5);
+
+                return Ok(get5Products);
             }
             catch (Exception ex)
             {
@@ -695,18 +698,26 @@ namespace NortwindApi.Controllers
         {
             try
             {
+
                 var product = _context.Products.FirstOrDefault(p => p.ProductName == productName);
+
+              
 
                 if (product == null)
                 {
                     return NotFound(new { message = $"Ürün adı '{productName}' ile eşleşen ürün bulunamadı." });
                 }
 
+
                 product.UnitPrice += increaseAmount;
 
                 _context.SaveChanges();
 
-                return Ok(new { message = $"Ürün '{productName}' fiyatına {increaseAmount} kadar zam yapıldı." });
+               
+
+
+                return Ok(product);
+
             }
             catch (Exception ex)
             {
@@ -758,7 +769,7 @@ namespace NortwindApi.Controllers
                                 orderId = o.OrderId,
                                 customerId = o.CustomerId,
                                 employeeName = emp.FirstName,
-                                orderDate = o.OrderDate,
+                                orderDate = o.OrderDate.Value.ToString("dd/MM/yyyy"),
                                 shippedDate = o.ShippedDate,
                                 shipVia = sh.CompanyName,
                                 freiht = o.Freight,
