@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
   <head>
     <meta charset="utf-8">
@@ -6,32 +6,34 @@
     <title>Northwind Sql Sorguları</title>
     <script src="main.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-  <style>
-        body {
-            margin-bottom: 20rem;
-        }
+    <style>
         a{
         text-decoration: none;
-        color: #000; 
+        color: #000; /* Varsayılan metin rengi (siyah) */
         }
 
         a:hover {
-         color: #007BFF; 
+         color: #007BFF; /* Açık mavi renk */
         }
+        .scroll{
+            overflow-x: scroll;
+        }
+        
+
 
     </style>
-  </head>
+    </head>
   <body>
 
     <!---------------------------------- NAVBAR ---------------------------------->
-    <nav class="navbar bg-body-tertiary">
+    <nav class="navbar bg-body-tertiary bg-info-subtle ">
         <div class="container-fluid">
-          <a class="navbar-brand" href="#">
+          <a class="navbar-brand">
             <img src="northwind-footer-logo.png" width="100 px" class="m-3 col">
 
             
           </a>
-          <h1 class="text-uppercase col"> Sql sorgu ekranı</h1>
+          <h1 class="text-uppercase col"> North wınd Sql sorgu ekranı</h1>
         </div>
     </nav>
     <!---------------------------------- NAVBAR ---------------------------------->
@@ -42,54 +44,119 @@
       <div class="container">
         <div class="row justify-content-center align-items-center g-2">
             
+            <div class="text-center mt-5 mb-3 ">
+                <h3> SQL Sorguları</h3>
+            </div>
+            <hr>
 
-            <div class="card text-center mt-5 mb-5">
-                <div class="card-header">
-                  SQL SORGULAR
-                </div>
-                <div class="card-body">
+            <div class="card text-center mt-5 mb-5 bg-info-subtle">
+                <!-- <div class="card-header">
+                  
+                </div> -->
+                <form  method="post">
+                <div class="card-body scroll ">
                   <h5 class="card-title">Sorgulamak için seçin</h5>
                         <div class="form-floating">
                             <select class="form-select" id="floatingSelect" aria-label="Floating label select example">
                                 <option selected>Sorgu Seçin</option>
-                                <option value="1">Tüm ürünlerin fiyatına dışarıdan gelen sayı kadar zam yap</option>
-                                <option value="2">ismi verilen ürünün fiyatına dışarıdan gelen sayı kadar zam yap</option>
-                                <option value="3">dışarıdan girilen kargo firmasıyla taşınmış, kargo ücreti 30 dan yüksek olan ve dışarıdan girilen yıla ait olan siparişlerin bilgilerini raporla</option>
+                                <option value="1">Tüm ürünlerin fiyatına belirlenen miktarda zam yap</option>
+                                <option value="2">İsmi verilen ürünün fiyatına belirlenen miktarda zam yap</option>
+                                <option value="3">Belirlenen kargo firmasıyla taşınmış, kargo ücreti 30'dan yüksek olan ve seçilen yıla ait olan siparişlerin bilgilerini raporla</option>
                                 <option value="4">En çok sipariş veren 3 ülkeyi listele</option>
-                                <option value="5">Beverages kategorisine ait ürünleri getir</option>
-                                <option value="6">1997 yılındaki tüm cirom ne kadar</option>
+                                <option value="5">"Beverages" kategorisine ait ürünleri getir</option>
+                                <option value="6">1997 yılındaki tüm ciromu göster</option>
                                 <option value="7">En çok kazandıran ilk 3 tedarikçiyi getir</option>
-                                <option value="8">Kargo şirketlerine göre taşınan sipariş sayıları</option>
-                                <option value="9">En az 15 sipariş vermiş müşterilerimin toplam sipariş adetini müşteri adı, müşteri ID verisi ve müşteri firmanın şehri ile birlikte raporla</option>
-                                <option value="11">Federal Shipping ile taşınmış olan siparişlerimi göster</option>
-                                <option value="12">Steven'in 97 mart ayında yaptığı satışların raporu</option>
-                                <option value="13">Speedy Express ile taşınmış Nancy'nin almış olduğu Dumon ya da Alfkı adlı müşterilerim tarafından verilmiş olan siparişleri getir</option>
-                                <option value="14">Almanyada yaşayan müşterilerimi getir</option>
-                                <option value="15">Tedarikçisinin posta kodu 33007 olan ürünlerimden deniz ürünleri (seafood) hariç ürünlerin yer aldığı siparişler ile ilgilenmiş çalışanlarımın ad, soyad, ev telefonu alanlarını getir</option>
+                                <option value="8">Kargo şirketlerine göre taşınan sipariş sayılarını görüntüle </option>
+                                <option value="9">En az 15 sipariş vermiş müşterilerin toplam sipariş adetini; müşteri adı, müşteri ID verisi ve müşteri firmanın şehri ile birlikte raporla</option>
+                                <option value="11">Federal Shipping ile taşınmış olan siparişleri göster</option>
+                                <option value="12">Steven'in 1997'deki Mart ayında yaptığı satışların raporunu görüntüle</option>
+                                <option value="13">Speedy Express ile taşınmış, Nancy'nin almış olduğu Dumon ya da Alfkı adlı müşteriler tarafından verilmiş olan siparişleri getir</option>
+                                <option value="14">Almanya'da yaşayan müşterileri getir</option>
+                                <option value="15">Tedarikçisinin posta kodu 33007 olan ürünlerden deniz ürünleri (seafood) hariç ürünlerin yer aldığı siparişler ile ilgilenmiş çalışanların ad, soyad, ev telefonu alanlarını getir</option>
                                 <option value="16">Speedy Express ile çalışmış ve Nancy'nin almış oldugu siparişleri göster</option>
-                                <option value="17">Konumu 'Eastern' olan müşterilerimin, federal shipping ile taşınan ürünlerini kategorilere göre sırala</option>
-                                <option value="18">Tedarik şehri londra olan, kargo şirketinin  4. harfi e olan stoğumda bulunan ve birim fiyatı 30 - 60 arasında olan siparişlerim neler</option>
-                                <option value="19">Satışı durdurulmuş ve aynı zamanda stoğu kalmamış ürünlerimin tedarikçilerinin isimlerini ve telefon numaralarını listele</option>
-                                <option value="20">New York şehrinden sorumlu çalışanlarım kimler</option>
-                                <option value="21">1 Ocak 1998 tarihinden sonra sipariş veren müşterilerimin isimlerini artan olarak sırala</option>
-                                <option value="22">Şehri tacoma olan çalışanlarımın aldığı siparişlerin listesi</option>
-                                <option value="23">En çok satan ürünün(adet olarak) kategori adini ve toplam satis adedini göster</option>
-                                <option value="24">Siparis detay tablosunun en çok siparisi verilen ürünlerini listele</option>
-                                <option value="25">Nancy'nin satmış olduğu ürünleri kategorileriyle birlikte müşteri isimleri ile getir</option>
-                                <option value="26">Ortalama (siparis bazli olarak) satis miktari üzerinde olan (para bazli olarak) satislari göster</option>
-                                <option value="27">Beverages kategorisine ait, Amerikalı toptancılardan alınmış, stoklarımda bulunan ürünlerin adlarını, ücretlerini ve KDV'li ücretlerini göster.</option>
-                                <option value="28">Müşterilerimin toplam sipariş adetlerini Müşteri adı ile birlikte raporla</option>
+                                <option value="17">Konumu 'Eastern' olan müşterilerin, Federal Shipping ile taşınan ürünlerini kategorilere göre sırala</option>
+                                <option value="18">Tedarik şehri Londra olan, kargo şirketinin  4. harfi "e" olan, stokta bulunan ve birim fiyatı 30 - 60 arasında olan siparişleri görüntüle</option>
+                                <option value="19">Satışı durdurulmuş ve aynı zamanda stoğu kalmamış ürünlerin, tedarikçilerinin isimlerini ve telefon numaralarını listele</option>
+                                <option value="20">New York şehrinden sorumlu çalışanları görüntüle</option>
+                                <option value="21">1 Ocak 1998 tarihinden sonra sipariş veren müşterilerin isimlerini artan olarak sırala</option>
+                                <option value="22">Şehri Tacoma olan çalışanların aldığı siparişleri listele</option>
+                                <option value="23">Adet olarak en çok satan ürünün kategori adını ve toplam satış adetini göster</option>
+                                <option value="24">Sipariş detay tablosunun en çok siparişi verilen ürünlerini listele</option>
+                                <option value="25">Nancy'nin satmış olduğu ürünleri, kategorileriyle birlikte müşteri isimleri ile getir</option>
+                                <option value="26">Ortalama (sipariş bazlı olarak) satış miktarı üzerinde olan (para bazlı olarak) satışları göster</option>
+                                <option value="27">Beverages kategorisine ait, Amerikalı toptancılardan alınmış, stoklarımda bulunan ürünlerin adlarını, ücretlerini ve KDV'li ücretlerini göster</option>
+                                <option value="28">Müşterilerimin toplam sipariş adetlerini, müşteri adı ile birlikte raporla</option>
                             </select>
                             <label for="floatingSelect">Çalışması için seçin!</label>
                         </div>
 
                         <div id="inputContainer" style="display: none;">
                             <div class="form-floating mt-3">
-                                <input type="text" class="form-control" id="inputValue" placeholder="Değer Girin">
-                                <label for="inputValue">Değer Girin</label>
+                                <input type="text" class="form-control" id="inputValue" placeholder="Değer Girin" required>
+
+                                <label for="inputValue">Zam değerini girin:</label>
                             </div>
                         </div>
                         
+                        <div id="inputContainer2" style="display: none;">
+                            <div class="form-floating mt-3">
+                                <select class="form-control" id="inputValueName" required>
+                                    <option value="Chai">Chai</option>
+                                    <option value="Chang">Chang</option>
+                                    <option value="Aniseed Syrup">Aniseed Syrup</option>
+                                    <option value="Chef Anton's Cajun Seasoning">Chef Anton's Cajun Seasoning</option>
+                                    <option value="Chef Anton's Gumbo Mix">Chef Anton's Gumbo Mix</option>
+                                    <option value="Grandma's Boysenberry Spread">Grandma's Boysenberry Spread</option>
+                                    <option value="Uncle Bob's Organic Dried Pears">Uncle Bob's Organic Dried Pears</option>
+                                    <option value="Northwoods Cranberry Sauce">Northwoods Cranberry Sauce</option>
+                                    <option value="Mishi Kobe Niku">Mishi Kobe Niku</option>
+                                    <option value="Ikura">Ikura</option>
+                                    <option value="Queso Cabrales">Queso Cabrales</option>
+                                    <option value="Queso Manchego La Pastora">Queso Manchego La Pastora</option>
+                                    <option value="Konbu">Konbu</option>
+                                    <option value="Tofu">Tofu</option>
+                                    <option value="Genen Shouyu">Genen Shouyu</option>
+                                    <option value="Pavlova">Pavlova</option>
+                                    <option value="Alice Mutton">Alice Mutton</option>
+                                    <option value="Carnarvon Tigers">Carnarvon Tigers</option>
+                                    <option value="Teatime Chocolate Biscuits">Teatime Chocolate Biscuits</option>
+                                    <option value="Sir Rodney's Marmalade">Sir Rodney's Marmalade</option>
+                                    <option value="Sir Rodney's Scones">Sir Rodney's Scones</option>
+                                    <option value="Gustaf's Knäckebröd">Gustaf's Knäckebröd</option>
+                                  </select>
+                                  
+                                <label for="inputValueName">Zam yapmak istediğiniz şirketin ismini girin:</label>
+
+                            </div>
+                            <div class="form-floating mt-3">
+
+                                <input type="text" class="form-control" id="inputValue2" placeholder="Değer Girin" required >
+                                <label for="inputValue2">Zam değerini girin:</label>
+                            </div>
+                        </div>
+
+                        <div id="inputContainer3" style="display: none;">
+                            <div class="form-floating mt-3">
+                                
+                                <select class="form-select" id="shipName" aria-label="Floating label select example" required >
+                                    <option selected>Kargo firması seçin:</option>
+                                    <option value="United Package">United Package</option>
+                                    <option value="Speedy Express">Speedy Express</option>
+                                    <option value="Federal Shipping">Federal Shipping</option>
+                                </select>
+                                <div class="form-floating mt-3">
+                                    <input type="text" class="form-control" id="inputYear" placeholder="Değer Girin" required >
+                                    <label for="inputYear">Yılı girin:</label>
+                                </div>
+                                <div class="form-floating mt-3">
+                                    <input type="text" class="form-control" id="MinShippingCost" placeholder="Değer Girin" required >
+                                    <label for="MinShippingCost">Minimum gönderim fiyatını belirleyin:</label>
+                                </div>
+                                
+                                
+                            </div>
+                        </div>
+
                         <div class="form-floating mt-3">
                             <button id="showBtn" class="btn btn-primary">Göster</button>
                         </div>    
@@ -100,9 +167,10 @@
 
 
                         <div class="icerik">
-                
+                            <p id="icerikici"></p>
                         </div>
                 </div>
+            </form>
               </div>
 
               
@@ -112,7 +180,40 @@
       </div>
     </main>
 <!---------------------------------- MAİN ---------------------------------->
+<footer class="absolute-bottom width-100 bg-dark-subtle text-center text-lg-start mt-5">
+    <div class="container-fluid p-4">
+        <div class="row">
+            <div class="col-4  mb-4 mb-md-0">
+                <h5 class="text-uppercase text-center">Versiyon</h5>
+                <p class="text-center">1.0.0</p>
+            </div>
 
+            <div class="col-4  mb-4 mb-md-0">
+                <h5 class="text-uppercase text-center">Telif Hakkı</h5>
+                <a href="https://github.com/cnkml9/NortwindApi_Project" target="_blank"><p class="text-center">© 2023 Tüm Hakları Saklıdır.</p></a>
+            </div>
+
+            <div class="col-4  mb-4 mb-md-0">
+                <h5 class="text-uppercase text-center">Emeği Geçenler</h5>
+                <ul class="list-unstyled mb-0 text-center">
+                <li>
+                    <a href="https://www.linkedin.com/in/mehmet-ali-selek-10a5ba282/" target="_blank">Mehmet Ali Selek</a>
+                </li>
+                <li>
+                    <a href="https://www.linkedin.com/in/mehmet-emin-kay%C4%B1han-287313237/" target="_blank" >Mehmet Emin Kayıhan</a>
+                </li>
+                <li>
+                    <a href="https://www.linkedin.com/in/kamil-can-4930a9203/" target="_blank">Kamil Can</a>
+                </li>
+                <li>
+                    <a href="https://www.linkedin.com/in/beyza-%C5%9Fim%C5%9Fek-159588235/" target="_blank">Beyza Şimşek</a>
+                </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</footer>
     <!---------------------------------- SCRİPT ---------------------------------->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
  
@@ -120,43 +221,8 @@
     <!---------------------------------- SCRİPT ---------------------------------->
 
 </body>
-  <!---------------------------------- FOOTER ---------------------------------->
-   
+<!---------------------------------- FOOTER ---------------------------------->
 
-  <footer class="fixed-bottom width-100 bg-light text-center text-lg-start">
-        <div class="container-fluid p-4">
-            <div class="row">
-                <div class="col-4  mb-4 mb-md-0">
-                    <h5 class="text-uppercase text-center">Versiyon</h5>
-                    <p class="text-center">1.0.0</p>
-                </div>
+<!---------------------------------- FOOTER ---------------------------------->
 
-                <div class="col-4  mb-4 mb-md-0">
-                    <h5 class="text-uppercase text-center">Telif Hakkı</h5>
-                    <a href="https://github.com/cnkml9/NortwindApi_Project" target="_blank"><p class="text-center">© 2023 Tüm Hakları Saklıdır.</p></a>
-                </div>
-
-                <div class="col-4  mb-4 mb-md-0">
-                    <h5 class="text-uppercase text-center">Emeği Geçenler</h5>
-                    <ul class="list-unstyled mb-0 text-center">
-                    <li>
-                        <a href="https://www.linkedin.com/in/mehmet-ali-selek-10a5ba282/" target="_blank">Mehmet Ali Selek</a>
-                    </li>
-                    <li>
-                        <a href="https://www.linkedin.com/in/mehmet-emin-kay%C4%B1han-287313237/" target="_blank" >Mehmet Emin Kayıhan</a>
-                    </li>
-                    <li>
-                        <a href="https://www.linkedin.com/in/kamil-can-4930a9203/" target="_blank" class="text-dark">Kamil Can</a>
-                    </li>
-                    <li>
-                        <a href="https://www.linkedin.com/in/beyza-%C5%9Fim%C5%9Fek-159588235/" target="_blank" class="text-dark">Beyza Şimşek</a>
-                    </li>
-                    </ul>
-                </div>
-
-            </div>
-        </div>
-</footer>
-
-  <!---------------------------------- FOOTER ---------------------------------->
 </html>
