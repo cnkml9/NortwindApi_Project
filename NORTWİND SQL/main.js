@@ -8,6 +8,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const showBtn = document.getElementById("showBtn");
     const resultDiv = document.getElementById("result");
     const inputValueName = document.getElementById("inputValueName");
+    
+    const shipName = document.getElementById("shipName");
+    const inputYear = document.getElementById("inputYear");
+    const MinShippingCost = document.getElementById("MinShippingCost");
 
     selectElement.addEventListener("change", () => {
         const selectedValue = selectElement.value;
@@ -67,6 +71,11 @@ document.addEventListener("DOMContentLoaded", () => {
     let endpoint = "";
 
     if (selectedValue === "1") {
+        if (isNaN(valueToSend)) {
+            resultDiv.style.display = "block";
+            resultDiv.innerHTML = "Hata: Lütfen bir sayı girin.";
+            return;
+        }
         endpoint = `https://localhost:7178/MakeRaise/${valueToSend}`;
     }
 
@@ -84,15 +93,23 @@ document.addEventListener("DOMContentLoaded", () => {
           body: JSON.stringify(postData)    
         });
       
-        const responseData = await response.json();
-        
-        resultDiv.style.display = "block";
-        resultDiv.innerHTML = "İşlem sonucu: " + responseData.message;
-        
+        if (response.ok) {
+            const responseData = await response.json();
+
+            resultDiv.style.display = "block";
+            resultDiv.innerHTML = "İşlem sonucu: Ürün Bilgileri<br>";
+
+            responseData.forEach(product => {
+                resultDiv.innerHTML +=
+                    `Ürün Adı: ${product.productName}<br>` +
+                    `Eski Fiyat: ${product.unitPrice + product.unitPrice * (valueToSend / 100)}<br>` +
+                    `Yeni Fiyat: ${product.unitPrice}<br><br>`;
+            });
+        }
       } catch (error) {
         resultDiv.style.display = "block";
-        resultDiv.innerHTML = "Hata oluştu: " + error.message;
-        console.log(error);
+        // resultDiv.innerHTML = "Hata oluştu: " + error.message;
+        console.log("Hata oluştu: ", error);
       }
 
 }
@@ -100,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
 async function handlePostRequest2(selectedValue, inputValueNameValue, inputValue2, resultDiv) {
     let endpoint = "";
 
-    if (selectedValue === "2") {
+    if (selectedValue === "2") {  
         endpoint = `https://localhost:7178/UpdatePrice/${inputValue2}/${inputValueNameValue}`;
     }
 
@@ -118,15 +135,22 @@ async function handlePostRequest2(selectedValue, inputValueNameValue, inputValue
           body: JSON.stringify(postData)    
         });
       
-        const responseData = await response.json();
-        
-        resultDiv.style.display = "block";
-        resultDiv.innerHTML = "İşlem sonucu: " + responseData.message;
-        
+        if (response.ok) {
+            const responseData = await response.json();
+            const productInfo = responseData; // API yanıtını ürün bilgileri olarak alın
+
+            // Ürün bilgilerini düzenleyerek "resultDiv" içeriğini güncelle
+            resultDiv.style.display = "block";
+            resultDiv.innerHTML = "İşlem sonucu: Ürün Bilgileri" +
+                `<br>Ürün Adı: ${productInfo.productName}` +
+                `<br>Yeni Fiyat: ${productInfo.unitPrice}` +
+                `<br>Eski Fiyat: ${productInfo.responseData}`; //hatalı, düzeltilmesi gerek
+
+        }
       } catch (error) {
         resultDiv.style.display = "block";
-        resultDiv.innerHTML = "Hata oluştu: " + error.message;
-        console.log(error);
+        // resultDiv.innerHTML = "Hata oluştu: " + error.message;
+        console.log("Hata oluştu: ", error);
       }
 
 }
@@ -163,7 +187,7 @@ async function handlePostRequest3(shipName, minShippingCost, orderYear, resultDi
     } catch (error) {
         resultDiv.style.display = "block";
         resultDiv.innerHTML = "Hata oluştu. Lütfen daha sonra tekrar deneyiniz.";
-        console.log(error);
+        console.log("Hata oluştu: ", error);
     }
 }
 
