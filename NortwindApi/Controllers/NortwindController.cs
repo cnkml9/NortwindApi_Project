@@ -472,18 +472,17 @@ namespace NortwindApi.Controllers
         {
             try
             {
-                using (var context = new NortwindContext())
-                {
-                    var query = from cts in context.Categories
-                                join prd in context.Products on cts.CategoryId equals prd.CategoryId
-                                join ordt in context.OrderDetails on prd.ProductId equals ordt.ProductId
-                                join ord in context.Orders on ordt.OrderId equals ord.OrderId
-                                join cst in context.Customers on ord.CustomerId equals cst.CustomerId
-                                join emp in context.Employees on ord.EmployeeId equals emp.EmployeeId
-                                join empt in context.EmployeeTerritories on emp.EmployeeId equals empt.EmployeeId
-                                join tr in context.Territories on empt.TerritoryId equals tr.TerritoryId
-                                join r in context.Regions on tr.RegionId equals r.RegionId
-                                join shp in context.Shippers on ord.ShipVia equals shp.ShipperId
+              
+                    var query = from cts in _context.Categories
+                                join prd in _context.Products on cts.CategoryId equals prd.CategoryId
+                                join ordt in _context.OrderDetails on prd.ProductId equals ordt.ProductId
+                                join ord in _context.Orders on ordt.OrderId equals ord.OrderId
+                                join cst in _context.Customers on ord.CustomerId equals cst.CustomerId
+                                join emp in _context.Employees on ord.EmployeeId equals emp.EmployeeId
+                                join empt in _context.EmployeeTerritories on emp.EmployeeId equals empt.EmployeeId
+                                join tr in _context.Territories on empt.TerritoryId equals tr.TerritoryId
+                                join r in _context.Regions on tr.RegionId equals r.RegionId
+                                join shp in _context.Shippers on ord.ShipVia equals shp.ShipperId
                                 where r.RegionDescription == "Eastern" && shp.ShipperId == 3
                                 select new
                                 {
@@ -500,7 +499,7 @@ namespace NortwindApi.Controllers
                     }
 
                     return Ok(categories);
-                }
+                
             }
             catch (Exception ex)
             {
@@ -508,7 +507,6 @@ namespace NortwindApi.Controllers
             }
 
         }
-
         [HttpGet("ShippersLondon")]
         public IActionResult ShippersLondon()
         {
@@ -556,7 +554,6 @@ namespace NortwindApi.Controllers
                 return BadRequest($"Hata: {ex.Message}");
             }
         }
-
         [HttpGet("DiscontinuedSale")]
         public IActionResult DiscontinuedSale()
         {
@@ -596,11 +593,10 @@ namespace NortwindApi.Controllers
         {
             try
             {
-                using (var context = new NortwindContext())
-                {
-                    var query = from t in context.Territories
-                                join empt in context.EmployeeTerritories on t.TerritoryId equals empt.TerritoryId
-                                join emp in context.Employees on empt.EmployeeId equals emp.EmployeeId
+              
+                    var query = from t in _context.Territories
+                                join empt in _context.EmployeeTerritories on t.TerritoryId equals empt.TerritoryId
+                                join emp in _context.Employees on empt.EmployeeId equals emp.EmployeeId
                                 where t.TerritoryDescription == "New York"
                                 select new
                                 {
@@ -624,7 +620,7 @@ namespace NortwindApi.Controllers
 
 
                     return Ok(employees);
-                }
+                
             }
             catch (Exception ex)
             {
@@ -638,10 +634,9 @@ namespace NortwindApi.Controllers
         {
             try
             {
-                using (var context = new NortwindContext())
-                {
-                    var query = from o in context.Orders
-                                join c in context.Customers on o.CustomerId equals c.CustomerId
+              
+                    var query = from o in _context.Orders
+                                join c in _context.Customers on o.CustomerId equals c.CustomerId
                                 where o.OrderDate > new DateTime(1998, 1, 1)
                                 orderby o.OrderDate ascending
                                 select new
@@ -659,7 +654,7 @@ namespace NortwindApi.Controllers
 
 
                     return Ok(results);
-                }
+                
             }
             catch (Exception ex)
             {
@@ -802,11 +797,10 @@ namespace NortwindApi.Controllers
         {
             try
             {
-                using (var context = new NortwindContext())
-                {
-                    var query = from od in context.OrderDetails
-                                join p in context.Products on od.ProductId equals p.ProductId
-                                join c in context.Categories on p.CategoryId equals c.CategoryId
+               
+                    var query = from od in _context.OrderDetails
+                                join p in _context.Products on od.ProductId equals p.ProductId
+                                join c in _context.Categories on p.CategoryId equals c.CategoryId
                                 group od by new { p.ProductId, p.ProductName, c.CategoryId, c.CategoryName } into g
                                 orderby g.Sum(x => x.Quantity) descending
                                 select new
@@ -827,7 +821,7 @@ namespace NortwindApi.Controllers
                     }
 
                     return Ok(result);
-                }
+                
             }
             catch (Exception ex)
             {
@@ -840,15 +834,14 @@ namespace NortwindApi.Controllers
         {
             try
             {
-                using (var context = new NortwindContext())
-                {
+               
                     //var totalUnitPrice = context.OrderDetails
                     //    .Join(context.Orders, od => od.OrderId, o => o.OrderId, (od, o) => new { OrderDetail = od, Order = o })
                     //    .Where(entry => entry.Order.OrderDate.HasValue && entry.Order.OrderDate.Value.Year < 1997)
                     //    .Sum(entry => entry.OrderDetail.UnitPrice);
                         
-                    var query = from od in context.OrderDetails
-                                join o in context.Orders on od.OrderId equals o.OrderId
+                    var query = from od in _context.OrderDetails
+                                join o in _context.Orders on od.OrderId equals o.OrderId
                                 where o.OrderDate.HasValue && o.OrderDate.Value.Year < 1997
                                 select od.UnitPrice;
 
@@ -862,7 +855,7 @@ namespace NortwindApi.Controllers
                     string jsonResponse = Newtonsoft.Json.JsonConvert.SerializeObject(response);
 
                     return Ok("["+jsonResponse+"]");
-                }
+                
             }
             catch (Exception ex)
             {
